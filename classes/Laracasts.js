@@ -1,6 +1,7 @@
 
 /** @module Laracasts */
 
+import querystring from 'querystring';
 import puppeteer from 'puppeteer';
 import jsdom from 'jsdom';
 const { JSDOM } = jsdom;
@@ -17,6 +18,28 @@ export default class Laracasts {
 	}
 
 	/**
+	 * Makes a POST request to the puppeteer page instance
+	 * @param  {String} url  The url to send the POST request to
+	 * @param  {Object} data The data to send 
+	 */
+	async pagePostRequest(url, data) {
+		await this.page.setRequestInterception(true);
+		this.page.once('request', request => {
+			request.continue({
+				'method': 'POST',
+				'postData': querystring.stringify(data),
+				'headers': {
+					...request.headers(),
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+			});
+			this.page.setRequestInterception(false);
+		});
+
+		await this.page.goto(url);
+	}
+
+	/**
 	 * Login to the laracasts website
 	 * @param  {String} email    The email used for the laracasts account
 	 * @param  {String} password The password used for the laracasts account
@@ -24,12 +47,16 @@ export default class Laracasts {
 	async login(email, password) {
 		this.browser = await puppeteer.launch();
 		this.page = await this.browser.newPage();
+
 		await this.page.goto('https://laracasts.com/login', { waitUntil: 'networkidle0' });
-		await this.page.focus('#email');
-		await this.page.keyboard.type(email);
-		await this.page.focus('#password');
-		await this.page.keyboard.type(password);
-		await this.page.click('[type=submit]');
+		let token = await this.page.$eval('input[name=_token]', el => el.value);
+
+		await this.pagePostRequest('https://laracasts.com/sessions', {
+			email,
+			password,
+			_token: token,
+			remember: 1
+		});	
 	}
 
 	/**

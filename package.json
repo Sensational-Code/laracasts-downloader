@@ -9,6 +9,7 @@
     "dotenv": "^8.2.0",
     "jsdom": "^16.4.0",
     "log-update": "^4.0.0",
-    "puppeteer": "^5.2.1"
+    "puppeteer": "^5.2.1",
+    "querystring": "^0.2.0"
   }
 }
