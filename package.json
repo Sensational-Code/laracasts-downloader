@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "scripts": {
+    "download": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "chalk": "^4.1.0",
+    "dotenv": "^8.2.0",
+    "jsdom": "^16.4.0",
+    "log-update": "^4.0.0",
+    "puppeteer": "^5.2.1"
+  }
+}
